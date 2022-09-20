@@ -1,0 +1,30 @@
+﻿@model Kongsli.LegacyNetFramework.Web.Controllers.HomeModel
+
+<div class="jumbotron">
+    <h1>AppSettings</h1>
+    <dl>
+        @foreach (var key in Model.AppSettings.Keys)
+        {
+            <dt>
+                @key
+            </dt>
+            <dd>
+                @Model.AppSettings[key]
+            </dd>
+        }
+    </dl>
+    <h1>ConnectionStrings</h1>
+    <dl>
+        @foreach (var key in Model.ConnectionStrings.Keys)
+        {
+            <dt>
+                @key
+            </dt>
+            <dd>
+                @Model.ConnectionStrings[key]
+            </dd>
+        }
+    </dl>
+
+</div>
+
