@@ -14,16 +14,18 @@ namespace Kongsli.LegacyNetFramework.Web.Controllers
             _shortUrlRepository = shortUrlRepository;
         }
 
+        // GET api/values/vg
+        public async Task<IHttpActionResult> Get(string id)
+        {
+            var content = await _shortUrlRepository.Get(id);
+            if (content == null) return NotFound();
+            return Ok(content);
+        }
+
         // GET api/values
         public async Task<IEnumerable<ShortUrl>> Get()
         {
             return await _shortUrlRepository.Get();
-        }
-
-        // GET api/values/5
-        public string Get(int id)
-        {
-            return "value";
         }
 
         // POST api/values

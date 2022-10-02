@@ -17,8 +17,17 @@ namespace Kongsli.LegacyNetFramework.Web
 
         public async Task<ICollection<ShortUrl>> Get()
         {
-            var shortUrls = await _connection.QueryAsync<ShortUrl>("");
+            var shortUrls = await _connection.QueryAsync<ShortUrl>(@"
+                SELECT ShortPath,Location from ShortUrls
+            ");
             return shortUrls.ToList();
+        }
+
+        public async Task<ShortUrl> Get(string path)
+        {
+            return await _connection.QueryFirstOrDefaultAsync<ShortUrl>(@"
+                SELECT ShortPath,Location from ShortUrls WHERE ShortPath = @path
+            ", new { path });
         }
     }
 

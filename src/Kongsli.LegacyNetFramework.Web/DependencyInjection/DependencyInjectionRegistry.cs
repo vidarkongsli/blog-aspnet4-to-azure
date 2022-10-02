@@ -1,4 +1,5 @@
-﻿using System.Data.SqlClient;
+﻿using System.Configuration;
+using System.Data.SqlClient;
 using StructureMap;
 
 namespace Kongsli.LegacyNetFramework.Web.DependencyInjection
@@ -7,7 +8,11 @@ namespace Kongsli.LegacyNetFramework.Web.DependencyInjection
     {
         public DependencyInjectionRegistry()
         {
-            For<IShortUrlDatabase>().Use(ctx => new ShortUrlDatabase(new SqlConnection())).Transient();
+            var defaultConnectionString = ConfigurationManager
+                .ConnectionStrings["default"].ConnectionString;
+            For<IShortUrlDatabase>().Use(
+                ctx => new ShortUrlDatabase(new SqlConnection(defaultConnectionString)))
+                .Transient();
         }
     }
 }

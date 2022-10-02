@@ -2,6 +2,8 @@
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
+using Dapper;
+using Kongsli.LegacyNetFramework.Web.Dapper;
 using Kongsli.LegacyNetFramework.Web.DependencyInjection;
 using StructureMap;
 using WebApi.StructureMap;
@@ -12,6 +14,8 @@ namespace Kongsli.LegacyNetFramework.Web
     {
         protected void Application_Start()
         {
+            SqlMapper.AddTypeHandler(new DapperUriTypeHandler());
+
             var container = new Container(x => x.AddRegistry<DependencyInjectionRegistry>());
             var controllerFactory = new StructureMapControllerFactory(container);
             ControllerBuilder.Current.SetControllerFactory(controllerFactory);
