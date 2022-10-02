@@ -5,6 +5,13 @@ VisualStudioVersion = 17.3.32825.248
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kongsli.LegacyNetFramework.Web", "Kongsli.LegacyNetFramework.Web\Kongsli.LegacyNetFramework.Web.csproj", "{3E098237-1EA0-4FF4-987D-B7303468D283}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{CC7D65EE-CB9B-4B45-B5A1-53FA1905EAA1}"
+	ProjectSection(SolutionItems) = preProject
+		..\tools\init-sqlserver.ps1 = ..\tools\init-sqlserver.ps1
+		..\tools\start-sqlserver.ps1 = ..\tools\start-sqlserver.ps1
+		..\tools\stop-sqlserver.ps1 = ..\tools\stop-sqlserver.ps1
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

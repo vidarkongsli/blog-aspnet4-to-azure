@@ -1,18 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Web.Http;
+using Kongsli.LegacyNetFramework.Web.Models;
 
 namespace Kongsli.LegacyNetFramework.Web.Controllers
 {
     public class ValuesController : ApiController
     {
-        // GET api/values
-        public IEnumerable<string> Get()
+        private readonly ShortUrlRepository _shortUrlRepository;
+
+        public ValuesController(ShortUrlRepository shortUrlRepository)
         {
-            return new string[] { "value1", "value2" };
+            _shortUrlRepository = shortUrlRepository;
+        }
+
+        // GET api/values
+        public async Task<IEnumerable<ShortUrl>> Get()
+        {
+            return await _shortUrlRepository.Get();
         }
 
         // GET api/values/5
