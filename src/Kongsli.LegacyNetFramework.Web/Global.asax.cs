@@ -1,10 +1,12 @@
-﻿using System.Web.Http;
+﻿using System.Configuration;
+using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
 using Dapper;
 using Kongsli.LegacyNetFramework.Web.Dapper;
 using Kongsli.LegacyNetFramework.Web.DependencyInjection;
+using Microsoft.ApplicationInsights.Extensibility;
 using StructureMap;
 using WebApi.StructureMap;
 
@@ -14,6 +16,12 @@ namespace Kongsli.LegacyNetFramework.Web
     {
         protected void Application_Start()
         {
+            var telemetryConnectionString = ConfigurationManager.AppSettings["APPINSIGHTS_CONNECTION_STRING"];
+            if (!string.IsNullOrWhiteSpace(telemetryConnectionString))
+            {
+                TelemetryConfiguration.Active.ConnectionString = telemetryConnectionString;
+            }
+
             SqlMapper.AddTypeHandler(new DapperUriTypeHandler());
 
             var container = new Container(x => x.AddRegistry<DependencyInjectionRegistry>());
