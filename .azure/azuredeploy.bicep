@@ -4,6 +4,8 @@ var aiName = '${replace(resourceGroup().name,'-rg','')}-ai'
 var applicationPlanName = '${replace(resourceGroup().name,'-rg','')}-plan'
 var webAppName = '${replace(resourceGroup().name,'-rg','')}-app'
 var logWorkspaceName = '${replace(resourceGroup().name,'-rg','')}-wrksp'
+var keyVaultName = '${replace(resourceGroup().name,'-rg','')}-kv'
+var keyVaultUri = 'https://${keyVaultName}${environment().suffixes.keyvaultDns}'
 
 resource logWorkspace 'Microsoft.OperationalInsights/workspaces@2022-10-01' = {
   properties: {
@@ -75,6 +77,9 @@ resource webApp 'Microsoft.Web/sites@2022-03-01' = {
   name: webAppName
   kind: 'app'
   location: location
+  identity:{
+    type: 'SystemAssigned'
+  }
   properties: {
     enabled: true
     hostNameSslStates: [
@@ -132,7 +137,93 @@ resource webApp 'Microsoft.Web/sites@2022-03-01' = {
           name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
           value: ai.properties.ConnectionString
         }
+        {
+          name: 'KEYVAULT_BASE_URL'
+          value: keyVaultUri
+        }
       ]
     }
+  }
+}
+
+resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
+  name: keyVaultName
+  location: location
+  tags: {
+  }
+  properties: {
+    sku: {
+      family: 'A'
+      name: 'standard'
+    }
+    tenantId: subscription().tenantId
+    accessPolicies: [
+      {
+        tenantId: subscription().tenantId
+        objectId: webApp.identity.principalId
+        permissions: {
+          keys: []
+          secrets: [
+            'Get'
+            'List'
+          ]
+          certificates: []
+        }
+      }
+      {
+        tenantId: '9cde71ba-4e99-413c-917c-3cbc32e8864d'
+        objectId: '2cb541ea-16c3-4672-ad11-cd39b0d34322'
+        permissions: {
+          keys: [
+            'Get'
+            'List'
+            'Update'
+            'Create'
+            'Import'
+            'Delete'
+            'Recover'
+            'Backup'
+            'Restore'
+            'GetRotationPolicy'
+            'SetRotationPolicy'
+            'Rotate'
+          ]
+          secrets: [
+            'Get'
+            'List'
+            'Set'
+            'Delete'
+            'Recover'
+            'Backup'
+            'Restore'
+          ]
+          certificates: [
+            'Get'
+            'List'
+            'Update'
+            'Create'
+            'Import'
+            'Delete'
+            'Recover'
+            'Backup'
+            'Restore'
+            'ManageContacts'
+            'ManageIssuers'
+            'GetIssuers'
+            'ListIssuers'
+            'SetIssuers'
+            'DeleteIssuers'
+          ]
+        }
+      }
+    ]
+    enabledForDeployment: false
+    enabledForDiskEncryption: false
+    enabledForTemplateDeployment: false
+    enableSoftDelete: true
+    softDeleteRetentionInDays: 90
+    enableRbacAuthorization: false
+    provisioningState: 'Succeeded'
+    publicNetworkAccess: 'Enabled'
   }
 }
