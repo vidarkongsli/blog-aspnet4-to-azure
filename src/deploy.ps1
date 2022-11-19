@@ -5,7 +5,7 @@ param (
 
 $projectPath = "$psscriptroot\Kongsli.LegacyNetFramework.Web\"
 
-Remove-Item "$projectPath\WebappContent\*" -recurse
+Remove-Item "$projectPath\WebappContent\*" -Recurse
 
 msbuild.exe $projectPath `
     /p:platform=AnyCPU /p:DeployOnBuild=true /p:WebPublishMethod=FileSystem /p:PackageAsSingleFile=true `
@@ -17,4 +17,4 @@ Compress-Archive -Path "$projectPath\WebappContent\*" -DestinationPath "$psscrip
 $webAppName = "$($rg.Replace('-rg',''))-app"
 
 az webapp deploy --resource-group $rg --name $webAppName --src-path $psscriptroot\bundle.zip `
-    --type zip --async true
+    --type zip --async true --subscription $subscription
