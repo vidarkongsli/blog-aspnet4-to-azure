@@ -1,11 +1,52 @@
 param location string = resourceGroup().location
+param sql_sa_creds string = '!?aA0${uniqueString(utcNow())}${uniqueString(resourceGroup().id)}'
 
-var aiName = '${replace(resourceGroup().name,'-rg','')}-ai'
-var applicationPlanName = '${replace(resourceGroup().name,'-rg','')}-plan'
-var webAppName = '${replace(resourceGroup().name,'-rg','')}-app'
-var logWorkspaceName = '${replace(resourceGroup().name,'-rg','')}-wrksp'
-var keyVaultName = '${replace(resourceGroup().name,'-rg','')}-kv'
-var keyVaultUri = 'https://${keyVaultName}${environment().suffixes.keyvaultDns}'
+var aiName = '${replace(resourceGroup().name, '-rg', '')}-ai'
+var applicationPlanName = '${replace(resourceGroup().name, '-rg', '')}-plan'
+var webAppName = '${replace(resourceGroup().name, '-rg', '')}-app'
+var logWorkspaceName = '${replace(resourceGroup().name, '-rg', '')}-wrksp'
+var keyVaultName = '${replace(resourceGroup().name, '-rg', '')}-kv'
+var sqlServerName = '${replace(resourceGroup().name, '-rg', '')}-sql'
+var sqlDatabaseName = 'default'
+
+resource sqlServer 'Microsoft.Sql/servers@2021-11-01' = {
+  location: location
+  name: sqlServerName
+  properties: {
+    administratorLogin: 'kongsli-admin'
+    administratorLoginPassword: sql_sa_creds
+    publicNetworkAccess: 'Enabled'
+    administrators: {
+      administratorType: 'ActiveDirectory'
+      principalType: 'Group'
+      login: 'SqlServerAdmins'
+      sid: '7a2dbbba-2776-4951-934f-14abef079637'
+      tenantId: subscription().tenantId
+    }
+  }
+}
+
+resource sqlDatabase 'Microsoft.Sql/servers/databases@2021-11-01' = {
+  parent: sqlServer
+  location: location
+  name: sqlDatabaseName
+  sku: {
+    name: 'GP_S_Gen5'
+    tier: 'GeneralPurpose'
+    family: 'Gen5'
+    capacity: 1
+  }
+  properties: {
+    collation: 'Danish_Norwegian_CI_AS'
+    maxSizeBytes: 1073741824
+    catalogCollation: 'SQL_Latin1_General_CP1_CI_AS'
+    zoneRedundant: false
+    readScale: 'Disabled'
+    requestedBackupStorageRedundancy: 'Geo'
+    isLedgerOn: false
+    minCapacity: 1
+  }
+}
 
 resource logWorkspace 'Microsoft.OperationalInsights/workspaces@2022-10-01' = {
   properties: {
@@ -77,7 +118,7 @@ resource webApp 'Microsoft.Web/sites@2022-03-01' = {
   name: webAppName
   kind: 'app'
   location: location
-  identity:{
+  identity: {
     type: 'SystemAssigned'
   }
   properties: {
@@ -138,8 +179,14 @@ resource webApp 'Microsoft.Web/sites@2022-03-01' = {
           value: ai.properties.ConnectionString
         }
         {
-          name: 'KEYVAULT_BASE_URL'
-          value: keyVaultUri
+          name: 'SecretApiKey'
+          value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=SecretApiKey)'
+        }
+      ]
+      connectionStrings: [
+        {
+          name: 'default'
+          connectionString: 'Server=${sqlServer.properties.fullyQualifiedDomainName}; Authentication=Active Directory Managed Identity; Encrypt=True; Database=${sqlDatabaseName}'
         }
       ]
     }

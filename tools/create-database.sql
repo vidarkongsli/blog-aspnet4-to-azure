@@ -113,4 +113,16 @@ GO
 ALTER DATABASE [default] SET  READ_WRITE 
 GO
 
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[ShortUrls](
+	[ShortPath] [nchar](255) NOT NULL,
+	[Location] [nvarchar](max) NOT NULL
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+
+GO
 

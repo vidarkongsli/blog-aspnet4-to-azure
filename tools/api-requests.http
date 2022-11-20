@@ -1,1 +1,5 @@
 GET http://localhost:51413/api/values/vg
+
+###
+
+GET https://blog-netlegacy-app.azurewebsites.net/api/values/vg

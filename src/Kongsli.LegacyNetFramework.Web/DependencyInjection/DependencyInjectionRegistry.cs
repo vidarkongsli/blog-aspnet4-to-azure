@@ -1,5 +1,5 @@
 ﻿using System.Configuration;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using StructureMap;
 
 namespace Kongsli.LegacyNetFramework.Web.DependencyInjection
